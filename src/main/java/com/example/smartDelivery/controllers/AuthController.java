@@ -1,7 +1,9 @@
 package com.example.smartDelivery.controllers;
 
+import com.example.smartDelivery.models.AppUser;
 import com.example.smartDelivery.models.AuthenticationRequest;
 import com.example.smartDelivery.models.AuthenticationResponse;
+import com.example.smartDelivery.services.AppUserService;
 import com.example.smartDelivery.services.MyUserDetailsService;
 import com.example.smartDelivery.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HelloController {
+@RequestMapping("authenticate")
+public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -25,14 +28,13 @@ public class HelloController {
     private MyUserDetailsService userDetailsService;
 
     @Autowired
+    AppUserService appUserService;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
-    @RequestMapping("/hello")
-    public String hello(){
-        return "Hello World";
-    }
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @RequestMapping(value = "/getToken", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
         try {
             authenticationManager.authenticate(
@@ -46,5 +48,10 @@ public class HelloController {
 
         final String jwt = jwtUtil.generateToken(userDetails);
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
+    }
+
+    @RequestMapping(value = "/register", method =  RequestMethod.POST)
+    public AppUser registerUser(@RequestBody AppUser appUser) throws Exception{
+        return appUserService.addUser(appUser);
     }
 }
